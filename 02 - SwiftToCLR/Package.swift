@@ -63,7 +63,7 @@ var clangLinkerSettings: LinkerSetting {
 func findLibPath() -> String {
     let developerPath = findDeveloperPath()
     let toolchain = findToolchain(in: developerPath)
-    return [toolchain, "usr", "lib"].joined(separator: pathSeparator)
+return [toolchain, "usr", "lib"].joined(separator: pathSeparator)
 }
 
 func findDeveloperPath() -> String {
@@ -75,7 +75,7 @@ func findDeveloperPath() -> String {
         .appendingPathComponent("Swift")
 
     if (try? userLocalDirectory.checkResourceIsReachable()) == true {
-        return userLocalDirectory.pathComponents.joined(separator: pathSeparator)
+        return userLocalDirectory.path
     }
 
     // Earlier/release builds install into <boot>/Library/Developer.
@@ -86,7 +86,7 @@ func findDeveloperPath() -> String {
 }
 
 func findToolchain(in developerPath: String) -> String {
-    let toolchainsPath = URL(fileURLWithPath: developerPath + pathSeparator + "Toolchains")
+    let toolchainsPath = URL(fileURLWithPath: developerPath).appending(component: "Toolchains")
     guard let children = try? FileManager.default.contentsOfDirectory(
         at: toolchainsPath,
         includingPropertiesForKeys: [.isDirectoryKey],
@@ -96,7 +96,7 @@ func findToolchain(in developerPath: String) -> String {
     }
     let toolchain = children.first(where: { (try? $0.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true })
     let toolchainName = toolchain?.lastPathComponent ?? "???"
-    return [developerPath, "Toolchains", toolchainName].joined(separator: pathSeparator)
+    return toolchainsPath.appending(component: toolchainName).path
 }
 
 #else
