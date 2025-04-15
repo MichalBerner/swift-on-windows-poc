@@ -23,7 +23,7 @@ struct WindowsPlatform {
             .appendingPathComponent("Swift")
 
         if (try? userLocalDirectory.checkResourceIsReachable()) == true {
-            return userLocalDirectory.pathComponents.joined(separator: pathSeparator)
+            return userLocalDirectory.path
         }
 
         // Earlier/release builds install into <boot>/Library/Developer.
@@ -34,7 +34,7 @@ struct WindowsPlatform {
     }
 
     static func findPlatforms(in developerPath: String) -> String {
-        let platformsPath = URL(fileURLWithPath: developerPath + pathSeparator + "Platforms")
+        let platformsPath = URL(fileURLWithPath: developerPath).appending(component: "Platforms")
         guard let children = try? FileManager.default.contentsOfDirectory(
             at: platformsPath,
             includingPropertiesForKeys: [.isDirectoryKey],
@@ -44,7 +44,7 @@ struct WindowsPlatform {
         }
         let platformContainer = children.first(where: { (try? $0.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true })
         let toolchainName = platformContainer?.lastPathComponent ?? "???"
-        return [developerPath, "Platforms", toolchainName].joined(separator: pathSeparator)
+        return platformsPath.appending(component: toolchainName).path
     }
 }
 
